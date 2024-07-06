@@ -1,15 +1,7 @@
-from flask import Flask, render_template, request, redirect, flash, send_file
+from flask import Flask, render_template, request, flash
 import asyncio
 import threading
-from collections import Counter
-import time
-from datetime import date, timedelta
-import datetime
-file1 = open('api/words2.txt', 'r') #
-Lines = file1.readlines()
 
-file2 = open('api/words.txt', 'r')
-answers = file2.readlines()
 
 someDic = {}
 app=Flask(__name__, template_folder="templates")
@@ -20,10 +12,10 @@ def index():
     if request.method == 'POST':
         print(request.form)
     elif request.method == 'GET':
-        return render_template('index.html')
+        return render_template('index.html', words = [])
 
-@app.route('/waffle', methods=['POST', 'GET']) ##Waffle Page
-def waffle():
+@app.route('/secondIndex', methods=['POST', 'GET']) ##Waffle Page
+def secondIndex():
     if request.method == 'POST':
         print(request.form)
         responses = ['r1', 'r2', 'r3']
@@ -47,13 +39,8 @@ def waffle():
                         break
                         return render_template('waffleRows.html')
 
-
             someDic[response] =[['_', '_', '_', "_", "_"], [], [] ] ##3 lists in the list: 1 for position, 1 for the letters that are in word, one for the ones that aren't
             word=request.form[response+'word']
-            if word=='':
-                flash('Specify a Word. Why didn\'t you specify a word?')
-                break
-                return render_template('waffleRows.html')
             for thing in thingsInForm:
                 flag=0
                 try:
@@ -109,10 +96,6 @@ def solveWaffle():
             someDic[response] = [['_', '_', '_', "_", "_"], [],
                                  []]  ##3 lists in the list: 1 for position, 1 for the letters that are in word, one for the ones that aren't
             word = request.form[response + 'word']
-            if word=='':
-                flash('Specify a Word. Why didn\'t you specify a word?')
-                break
-                return render_template('waffleColumns.html')
             for thing in thingsInForm:
                 flag = 0
                 try:
@@ -230,7 +213,7 @@ async def solveWaffle(theDic):
     return answerDoc
 
 
-async def solveWordle(wordd,notWork, placement, letters):
+async def solveWordle(notWork, placement, letters):
     noo = []
     possibleWords = []
     for letter in notWork: #notWork is a string of all the leters that hopefully dont work
@@ -261,8 +244,6 @@ async def solveWordle(wordd,notWork, placement, letters):
     else:
         return possibleWords
 
-
-
 @app.route('/solve', methods=['POST', 'GET'])
 def solver():
     print(request.form)
@@ -270,48 +251,24 @@ def solver():
     asyncio.set_event_loop(asyncio.new_event_loop())
     loop = asyncio.get_event_loop()
     #Getting the ones that exist
-    count=0
-    while count < 5:
-        count +=1
-        try:
-            print(request.form['green'+str(count)])
-        except:
-            print('waafcdsfafdsafada')
-        else:
-            try:
-                print(request.form['yellow' + str(count)])
-            except:
-                print('double wacka')
-            else:
-                flash('Please specify only 1 check mark per letter.')
-                return render_template('index.html')
-                break
     if request.form['notWork'] != '' or ' ' not in request.form['notWork']:
         thingsInForm = ['green1', 'green2', 'green3', 'green4', 'green5', 'yellow1', 'yellow2', 'yellow3', 'yellow4', 'yellow5']
-        word = request.form['word']
         placement=['_', '_', '_', '_', '_']
         knownLetters=[]
         for thing in thingsInForm:
-            flag=0
-            try:
-                print(request.form[thing])
-            except: #Doesnt exist
-                flag+=1
-            else:
-                if flag==0:
-                    if 'green' in thing:
-                        index = int(thing[5:])-1
-                        placement[int(index)] = word[index]
-                        knownLetters.append(word[index])
-                    else:
-                        index = int(thing[6:]) - 1
-                        knownLetters.append(word[index])
-        result = loop.run_until_complete(solveWordle(request.form['word'], request.form['notWork'], placement, knownLetters))
+            if request.form[thing]:
+                if 'green' in thing:
+                    index = int(thing[5:]) - 1
+                    placement[int(index)] = request.form[thing]
+                    knownLetters.append(request.form[thing])
+                else:
+                    knownLetters.append(request.form[thing])
+        result = loop.run_until_complete(solveWordle(request.form['notWork'], placement, knownLetters))
         if '999' in result:
             flash('Sorry, no words were found.')
             return render_template('index.html')
         else:
-            return render_template('possibleWords.html', words=result)
+            return render_template('index.html', words=result)
     else:
         if request.form['notWork'] == '':
             flash('Please specify some letters that are grey (don\'t work)!')
@@ -319,64 +276,3 @@ def solver():
         else:
             flash('Don\'t add a space in the grey letter list.')
             return render_template('index.html')
-import requests
-import json
-
-def getCheatedAnswer(query="today"):
-    url = "https://wordle-answers-solutions.p.rapidapi.com/answers"
-    headers = {
-	"X-RapidAPI-Key": "03193673b0msh98a50bc174e7781p161edajsne33c1fadb5db",
-	"X-RapidAPI-Host": "wordle-answers-solutions.p.rapidapi.com"
-    }
-    response = requests.request("GET", url, headers=headers)
-    if query == 'tomorrow':
-        return json.loads(response.text)['data'][0]['answer']
-    else:
-        return json.loads(response.text)['data'][1]['answer']
-
-
-@app.route('/cheat', methods=['POST', 'GET'])
-def cheater():
-    asyncio.set_event_loop(asyncio.new_event_loop())
-    loop = asyncio.get_event_loop()
-    print(request.form)
-    print(f"Inside flask function: {threading.current_thread().name}")
-    if request.form['the_date'] == '':
-        flash('Choose one of the options to cheat.')
-        return render_template('index.html')
-    elif request.form['the_date']=='today':
-        #trueWordleDate = date.today()
-        #trueWordleDate = trueWordleDate.strftime("%b %d %Y")
-        leAnswer = []
-        #for n in answers:
-            #if trueWordleDate in n:
-                #leAnswer.append(n)
-                #break
-
-        ans=getCheatedAnswer('today')
-        leAnswer.append(ans)
-        return render_template('possibleWords.html', words=leAnswer)
-    elif request.form['the_date'] == 'tomorrow':
-        #trueWordleDate = date.today()
-        #trueWordleDate = trueWordleDate + timedelta(1)
-        #trueWordleDate = trueWordleDate.strftime("%b %d %Y")
-        leAnswer = []
-        #for n in answers:
-            #if trueWordleDate in n:
-                #leAnswer.append(n)
-                #break
-        ans=getCheatedAnswer('tomorrow')
-        leAnswer.append(ans)
-        return render_template('possibleWords.html', words=leAnswer)
-    else:
-        d = datetime.datetime.strptime(request.form['the_date'], "%Y-%m-%d")
-        trueWordleDate = d.strftime("%b %d %Y")
-
-        leAnswer = []
-        for n in answers:
-            if trueWordleDate in n:
-                leAnswer.append(n)
-                break
-
-        return render_template('possibleWords.html', words=leAnswer)
-
