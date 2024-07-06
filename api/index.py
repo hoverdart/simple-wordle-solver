@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, flash
 import asyncio
 import threading
 
+file1 = open('api/words2.txt', 'r') #
+Lines = file1.readlines()
 
 someDic = {}
 app=Flask(__name__, template_folder="templates")
