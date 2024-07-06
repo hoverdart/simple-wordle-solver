@@ -261,10 +261,10 @@ def solver():
             if request.form[thing]:
                 if 'green' in thing:
                     index = int(thing[5:]) - 1
-                    placement[int(index)] = request.form[thing]
-                    knownLetters.append(request.form[thing])
+                    placement[int(index)] = request.form[thing].lower()
+                    knownLetters.append(request.form[thing].lower())
                 else:
-                    knownLetters.append(request.form[thing])
+                    knownLetters.append(request.form[thing].lower())
         result = loop.run_until_complete(solveWordle(request.form['notWork'], placement, knownLetters))
         if '999' in result:
             flash('Sorry, no words were found.')
