@@ -5,10 +5,10 @@ from collections import Counter
 import time
 from datetime import date, timedelta
 import datetime
-file1 = open('simpleWordleSolver/api/words2.txt', 'r') #
+file1 = open('api/words2.txt', 'r') #
 Lines = file1.readlines()
 
-file2 = open('simpleWordleSolver/api/words.txt', 'r')
+file2 = open('api/words.txt', 'r')
 answers = file2.readlines()
 
 someDic = {}
