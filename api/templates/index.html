@@ -4,30 +4,37 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
+    <link rel="icon" type="image/x-icon" href="https://i.imgur.com/oMqNtNa.png">
     <title>Wordle Solver</title>
      <style>
          body {
-            background-image: url("https://img.freepik.com/free-photo/gray-abstract-wireframe-technology-background_53876-101941.jpg?w=2000");
-            background-repeat: no-repeat;
-            background-size: 150% 150%;
+            background-image: url("https://us.123rf.com/450wm/asamask92/asamask921604/asamask92160400081/55517312-white-blue-sky-gradient-background-vector-illustration.jpg");
+            background-repeat: repeat-x;
          }
+         .letter-box {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 0 2px;
+            display: inline-block;
+        }
+        .scrollable-table {
+            max-height: 400px; /* Adjust the height as needed */
+            overflow-y: auto;
+        }
      </style>
-      <link rel="icon" type="image/x-icon" href="https://i.imgur.com/oMqNtNa.png">
-
   </head>
   <body>
 
   <div class="container bg-secondary p-5">
     <h1 class="text-white text-center">Wordle Solver</h1>
-      <h5 class="text-white text-center">Need some help with the Wordle? Try using our solver tool! Or cheat. Whatever works for you.</h5>
       <h5 class="text-white text-center">Try our new Waffle Solver <a href="/waffle">here!</a></h5>
   </div>
   <br>
-  <!--The code below is gonna be the error messages!11!-->
+  <!--Errors-->
               {% with messages = get_flashed_messages() %}
                 {%if messages%}
                     {% for message in messages %}
@@ -39,105 +46,97 @@
                 {% endif %}
               {% endwith %}
 
-        <!--style="text-align:left; justify-content:space-between; vertical-align: middle;"-->
       <form action="/solve" method="POST">
-          <div class="container">
-            <div class="row text-center justify-content-center border border-success" style="border-width:3px !important;">
-                <span class="text-black"><b>Check each one if the letter is "Green" (has a set placement) on the Wordle.</b></span>
-                 <div class="col-1">
-                     <input type="checkbox" id="green1" name="green1" value="True">
-                 </div>
-                 <div class="col-1">
-                     <input type="checkbox" id="green2" name="green2" value="True">
-                 </div>
-                 <div class="col-1">
-                     <input type="checkbox" id="green3" name="green3" value="True">
-                 </div>
-                 <div class="col-1">
-                     <input type="checkbox" id="green4" name="green4" value="True">
-                 </div>
-                 <div class="col-1">
-                     <input type="checkbox" id="green5" name="green5" value="True">
-                 </div>
-
-             </div>
-            <br>
-
-            <div class="row">
-                <div class="col"> <!--For reg files, the next column has "select file"-->
-                </div>
-
-                <div class="col"> <!--For reg files, the next column has "select file"-->
-                    <div class="square p-6">
-                        <textarea name="word" MaxLength="5" class="form-control text-center" style="font-size: 50px; height:20px;" id="word" placeholder="Enter Word"></textarea>
-                    </div>
-                </div>
-
-                <div class="col">
+          <div class="container mt-5">
+        <div class="row">
+            <div class="col">
+                <h2>How to Use the <span style="color: green;">Simple WORDLE</span> Solver</h2>
+                <ol class = "list-group">
+                    <li class="list-group-item list-group-item-success text-white">
+                        Enter the letters that are highlighted in green on the Wordle in the "Correct Letters" section. Each letter should be placed in its corresponding position.
+                    </li>
+                    <li class="list-group-item list-group-item-warning text-white">
+                        Enter the letters that are highlighted in yellow on the Wordle in the "Valid Letters" section. The position of each letter is not important.
+                    </li>
+                    <li class="list-group-item list-group-item-dark text-white">
+                        Enter the letters that are highlighted in gray on the Wordle in the "Absent Letters" section.
+                    </li>
+                    <li class="list-group-item list-group-item-primary text-white">
+                        Click on the "Solve!" button to find possible words based on your inputs!
+                    </li>
+                </ol>
+            </div>
+            <div class="col">
+                <h2>Possible Answers: <span style="color: green;">{% if words %} {{words|length}} {%else%} {{0}} {%endif%}</span></h2>
+                <div class="scrollable-table">
+                <table class="table table-striped" style = "overflow:auto;">
+                    <tbody>
+                            {% for word in words %}
+                            <tr>
+                                <th scope="row">{{words.index(word)+1}}</th>
+                                <td>{{word}}</td>
+                            </tr>
+                            {% endfor %}
+                    </tbody>
+                </table>
                 </div>
             </div>
 
-             <br>
-             <div class="row">
-                 <div class="col">
-                </div><div class="col">
-                <textarea name="notWork"  class="form-control text-center" style="height:10px;" id="notWork" placeholder="Enter the letters that don't work/are gray."></textarea>
-             </div>
-                 <div class="col">
-                </div>
-
-             </div>
-              <br>
-             <div class="row text-center justify-content-center border border-warning" style="border-width:3px !important;">
-
-                 <div class="col-1">
-                     <input type="checkbox" id="yellow1" name="yellow1" value="True">
-                 </div>
-                 <div class="col-1">
-                     <input type="checkbox" id="yellow2" name="yellow2" value="True">
-                 </div>
-                 <div class="col-1">
-                     <input type="checkbox" id="yellow3" name="yellow3" value="True">
-                 </div>
-                 <div class="col-1">
-                     <input type="checkbox" id="yellow4" name="yellow4" value="True">
-                 </div>
-                 <div class="col-1">
-                     <input type="checkbox" id="yellow5" name="yellow5" value="True">
-                 </div>
-                 <span class="text-black text-bold"><b>Check each one if the letter is "Yellow" (has no placement) on the Wordle.</b></span>
-
-             </div>
-              <br>
-            <div class="row">
-                <button type="submit" name="solve_word" class="btn btn-secondary" style="float: right; width:100%;">Solve!</button>
+            <div class="col">
+                <h2>Find my <span style="color: green;">WORDLE</span></h2>
+                <form>
+                    <div class="mb-3">
+                        <label for="greens" class="form-label badge bg-success text-bg-primary">Correct Letters</label>
+                        <div id="greensContainer">
+                            <input type="text" class="form-control letter-box" id="green1" name= "green1" maxlength="1" oninput="moveToNext(this, 'green')">
+                            <input type="text" class="form-control letter-box" id="green2" name= "green2" maxlength="1" oninput="moveToNext(this, 'green')">
+                            <input type="text" class="form-control letter-box" id="green3" name= "green3" maxlength="1" oninput="moveToNext(this, 'green')">
+                            <input type="text" class="form-control letter-box" id="green4" name= "green4" maxlength="1" oninput="moveToNext(this, 'green')">
+                            <input type="text" class="form-control letter-box" id="green5" name= "green5" maxlength="1" oninput="moveToNext(this, 'green')">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="yellows" class="form-label badge bg-warning text-bg-primary ">Valid Letters</label>
+                        <div id="yellowsContainer">
+                            <input type="text" class="form-control letter-box" id="yellow1" name= "yellow1" maxlength="1" oninput="moveToNext(this, 'yellow')">
+                            <input type="text" class="form-control letter-box" id="yellow2" name= "yellow2" maxlength="1" oninput="moveToNext(this, 'yellow')">
+                            <input type="text" class="form-control letter-box" id="yellow3" name= "yellow3" maxlength="1" oninput="moveToNext(this, 'yellow')">
+                            <input type="text" class="form-control letter-box" id="yellow4" name= "yellow4" maxlength="1" oninput="moveToNext(this, 'yellow')">
+                            <input type="text" class="form-control letter-box" id="yellow5" name= "yellow5" maxlength="1" oninput="moveToNext(this, 'yellow')">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="absentLetters" class="form-label badge bg-secondary text-bg-primary" >Absent Letters</label>
+                        <div id="absentLettersContainer">
+                            <input type="text" name="notWork" id="notWork" size="20">
+                        </div>
+                    </div>
+                    <button type="submit" name="solve_word" class="btn btn-primary">Solve!</button>
+                </form>
             </div>
         </div>
+    </div>
       </form>
   <br>
-  <form action="/cheat" method="POST">
-      <div class="container">
-          <h3 class="text-center">Or, Get the Answer Directly:</h3>
-          <div class="container text-center">
-              <div class="col">
-                <input type="checkbox" id="today" name="the_date" value="today">
-                <label for="today">For Today</label><br>
-              </div>
-              <div class="col">
-                <input type="checkbox" id="tomorrow" name="the_date" value="tomorrow">
-                <label for="tomorrow">For Tomorrow</label><br>
-              </div>
-
-          </div>
-          <br>
-            <button type="submit" name="cheat_lol" class="btn btn-secondary" style="float: right; width:100%;">Cheat!</button>
-      </div>
-  </form>
-
-
-    <!-- Optional JavaScript; choose one of the two! -->
-
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+  <script>
+        function moveToNext(currentInput, type) {
+            if (currentInput.value.length === 1) {
+                let nextInputId = parseInt(currentInput.id.replace(`${type}`, '')) + 1;
+                let nextInput = document.getElementById(type+nextInputId);
+                console.log(type+nextInputId);
+                if (nextInput) {
+                    nextInput.focus();
+                }
+            }else{
+                let nextInputId = parseInt(currentInput.id.replace(`${type}`, '')) - 1;
+                let nextInput = document.getElementById(type+nextInputId);
+                console.log(type+nextInputId);
+                if (nextInput) {
+                    nextInput.focus();
+                }
+            }
+        }
+    </script>
+  <script  src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
   </body>
 </html>
