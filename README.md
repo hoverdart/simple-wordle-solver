@@ -1,11 +1,11 @@
 # Simple Wordle Solver
 
-[Try the browser solver](https://simplewordlesolver.vercel.app/). Enter your guesses and color feedback; the solver remembers every row, narrows the list of possible words, and suggests information-rich next guesses. No account, server inference, or uploaded board.
+[Try the browser solver](https://wordle.shauryav.com/). Enter your guesses and color feedback; the solver remembers every row, narrows the list of possible words, and suggests information-rich next guesses. No account, server inference, or uploaded board.
 
-- [Daily word challenge](https://simplewordlesolver.vercel.app/today/): our own playable five-letter puzzle with optional hints and a solver walkthrough.
-- [Challenge archive](https://simplewordlesolver.vercel.app/archive/): every published edition of the original challenge, beginning November 19, 2026.
-- [Selected NYT Wordle answers](https://simplewordlesolver.vercel.app/wordle-answer/): a separate, explicitly incomplete editorial index built from independently verified published facts. It does **not** pull unpublished puzzles or crawl NYT.
-- [Method](https://simplewordlesolver.vercel.app/method/): scoring, entropy ranking, the offline benchmark, and data limitations.
+- [Daily word challenge](https://wordle.shauryav.com/today/): our own playable five-letter puzzle with optional hints and a solver walkthrough.
+- [Challenge archive](https://wordle.shauryav.com/archive/): every published edition of the original challenge, beginning November 19, 2026.
+- [Selected NYT Wordle answers](https://wordle.shauryav.com/wordle-answer/): a separate, explicitly incomplete editorial index built from independently verified published facts. It does **not** pull unpublished puzzles or crawl NYT.
+- [Method](https://wordle.shauryav.com/method/): scoring, entropy ranking, the offline benchmark, and data limitations.
 
 ## Run locally
 
