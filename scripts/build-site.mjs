@@ -1,3 +1,4 @@
+import {createHash} from 'node:crypto';
 import {mkdir, readFile, writeFile, rm, copyFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {evaluate} from '../engine.mjs';
@@ -32,6 +33,16 @@ for(const file of ['styles.css','assets/literata-latin.woff2','assets/literata-o
   const dest=new URL(file,out);await mkdir(fileURLToPath(new URL('.',dest)),{recursive:true});
   await copyFile(new URL(file,root),dest);
 }
+// Roll HTML, CSS and the entry script together even for visitors with a warm cache.
+const versioned = {};
+for (const file of ['styles.css','pages.css','app.mjs','play.mjs']) {
+  const contents=await readFile(new URL(file,root));
+  const digest=createHash('sha256').update(contents).digest('hex').slice(0,12);
+  const stem=file.slice(0,file.lastIndexOf('.')), extension=file.slice(file.lastIndexOf('.'));
+  const name=stem+'.'+digest+extension;
+  await put(name,contents);
+  versioned[file]='/'+name;
+}
 const newest=editions.at(-1);
 await put('data/challenge.json',JSON.stringify({schemaVersion:1,timeZone:zone,editions},null,2)+'\n');
 await put('data/benchmark.json',JSON.stringify({
@@ -50,7 +61,7 @@ function shell({path,title,description,heading,body,noindex=false}) {
   '<meta property="og:description" content="'+e(description)+'"><meta property="og:url" content="'+e(url(path))+'">'+
   (noindex?'<meta name="robots" content="noindex,follow">':'')+
   '<link rel="icon" href="'+href('/favicon.svg')+'" type="image/svg+xml">'+
-  '<link rel="stylesheet" href="'+href('/styles.css')+'"><link rel="stylesheet" href="'+href('/pages.css')+'">'+
+  '<link rel="stylesheet" href="'+href(versioned['styles.css'])+'"><link rel="stylesheet" href="'+href(versioned['pages.css'])+'">'+
   '</head><body><a class="skip" href="#page-content">Skip to content</a><div class="edition"><header class="edition-nav">'+link('/','Wordle Solver')+
   '<nav aria-label="Main">'+nav.map(([p,label])=>'<a href="'+e(href(p))+'"'+(p===path?' aria-current="page"':'')+'>'+e(label)+'</a>').join('')+'</nav></header>'+
   '<main class="edition-main" id="page-content"><h1>'+e(heading)+'</h1>'+body+
@@ -83,7 +94,7 @@ await writePage('/today/',{
   heading:'Today’s word challenge',
   body:'<p class="edition-lede">Latest posted edition: <strong>'+e(dated(newest.date))+'</strong>. This is our own five-letter daily puzzle, not the NYT Wordle answer. Editions are dated in New York time.</p>'+
     '<section class="edition-section"><h2>Play this edition</h2><form id="challenge-form"><label for="challenge-guess">Five-letter guess</label> <input id="challenge-guess" maxlength="5" pattern="[A-Za-z]{5}" autocomplete="off" autocapitalize="characters" required> <button type="submit" disabled>Guess</button></form><p id="challenge-status" role="status">Loading challenge…</p><ol class="replay-rows" id="challenge-rows"></ol></section>'+
-    '<script type="module" src="'+href('/play.mjs')+'"></script>'+shape(newest.answer)+spoiler(newest)+'<p>'+link(dailyPath(newest),'Permanent link for this edition')+' · '+link('/archive/','Browse the archive')+'</p>'
+    '<script type="module" src="'+href(versioned['play.mjs'])+'"></script>'+shape(newest.answer)+spoiler(newest)+'<p>'+link(dailyPath(newest),'Permanent link for this edition')+' · '+link('/archive/','Browse the archive')+'</p>'
 });
 await writePage('/archive/',{
   title:'Daily Word Challenge Archive | Simple Wordle Solver',
@@ -155,6 +166,7 @@ await writePage('/waffle/',{
   body:'<p class="edition-lede">The experimental Waffle helper was part of the old Flask project and is not served by this static Wordle rebuild.</p><p><a href="https://wafflegame.net/">Play Waffle</a> · <a href="https://github.com/hoverdart/simple-wordle-solver/tree/3e5fae45b9d4f4c92d836239561be308138e9476">Original source</a></p>',noindex:true
 });
 let home=await read('index.html');
+for(const file of ['styles.css','app.mjs'])home=home.replaceAll('"/'+file+'"','"'+versioned[file]+'"');
 // The repository default is the project's Vercel root; allow portable static hosting.
 home=home.replaceAll('https://wordle.shauryav.com/',base.href);
 if(base.pathname!=='/')home=home.replace(/(href|src)="\/(?!\/)/g,'$1="'+base.pathname);

@@ -41,6 +41,10 @@ for(const row of challenge.editions){
   const result=solve(row.answer,{answers:bank,guesses:bank,firstGuess:'slate'});
   result.history.forEach(step=>assert.equal(scoreGuess(step.guess,row.answer),step.pattern));
 }
+assert.match(await read('index.html'),/\/styles\.[a-f0-9]{12}\.css"/);
+assert.match(await read('index.html'),/\/app\.[a-f0-9]{12}\.mjs"/);
+assert.match(await read('today/index.html'),/\/pages\.[a-f0-9]{12}\.css"/);
+assert.match(await read('today/index.html'),/\/play\.[a-f0-9]{12}\.mjs"/);
 const published=JSON.parse(await read('data/daily.json'));
 for(const row of published.editions){
   const html=await read('wordle-answer/'+row.date+'/index.html');
