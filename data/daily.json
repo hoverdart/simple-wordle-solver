@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "kind": "published-wordle-records",
+  "timeZone": "America/New_York",
+  "updatedAt": "2026-11-19T08:59:26.610Z",
+  "coverage": {
+    "from": "2026-11-19",
+    "to": "2026-11-19",
+    "count": 1,
+    "complete": false
+  },
+  "editions": [
+    {
+      "date": "2026-11-19",
+      "answer": "clout",
+      "id": 1979,
+      "sourceUrl": "https://parade.com/living/wordle-today-hint-answer-1979-thursday-november-19-2026",
+      "rights": "manual-public-fact",
+      "rightsEvidenceUrl": "https://wordfinder.yourdictionary.com/wordle/answers/",
+      "retrievedAt": "2026-11-19T08:59:26.610Z"
+    }
+  ]
+}
