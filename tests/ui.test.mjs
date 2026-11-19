@@ -27,14 +27,19 @@ test('dictionary failure has explicit fallback and no fake counts',async()=>{con
 
 test('original daily challenge is spoiler-gated and isolated from manual board',async()=>{const {get}=await fixture({challenge:true});assert.equal(get('daily-answer').hidden,true);assert.equal(get('daily-answer').textContent,'');get('reveal').click();assert.equal(get('daily-answer').textContent,'APPLE');assert.equal(get('daily-answer').hidden,false);assert.equal(get('candidate-count').textContent,'9');get('reveal').click();assert.equal(get('daily-answer').hidden,true);assert.equal(get('daily-answer').textContent,'');});
 
-test('homepage preserves original Bootstrap-style visual structure without remote visual assets',()=>{
+test('homepage uses ruled editorial layout, local serif type, and form-first reading order',()=>{
  const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
  const css=fs.readFileSync(new URL('../styles.css',import.meta.url),'utf8');
- assert.match(html,/class="title-slab"/);assert.match(html,/>Wordle Solver<\/h1>/);
- assert.match(html,/<tbody id="candidates">/);assert.match(html,/class="list-success"/);
- assert.doesNotMatch(html,/eyebrow|crystal ball|Make your next|A FRESH CHALLENGE/);
- assert.doesNotMatch(css,/@import|url\(/);assert.match(css,/\.title-slab\{background:#6c757d/);
- assert.match(css,/\.input-panel\{order:0\}/);assert.match(css,/\.results-panel\{order:1\}/);
+ assert.match(html,/class="masthead"/);assert.match(html,/>Wordle Solver<\/h1>/);
+ assert.ok(html.indexOf('id="guess-form"')<html.indexOf('id="results-title"'));
+ assert.match(html,/<tbody id="candidates">/);
+ assert.match(html,/aria-current="page"/);
+ assert.doesNotMatch(html,/eyebrow|title-slab|crystal ball|Make your next|A FRESH CHALLENGE/);
+ assert.doesNotMatch(css,/@import|url\(["']?https?:|linear-gradient/);
+ assert.match(css,/--paper: #f8f6ef/);
+ assert.match(css,/assets\/literata-latin\.woff2/);
+ assert.match(css,/@media \(max-width: 670px\)/);
+ assert.match(css,/grid-template-columns: minmax\(0, 1fr\)/);
 });
 test('candidate table rows retain accessible word actions',async()=>{
  const {get,submit}=await fixture();submit('allee','21002');submit('ample','20222');
