@@ -1,0 +1,28 @@
+.edition{max-width:64rem;margin:auto;padding:1.5rem clamp(1rem,4vw,3.5rem);color:#edf1eb}
+.edition-nav,.edition-pager{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:.75rem;padding:1rem 0}
+.edition-nav nav{display:flex;flex-wrap:wrap;gap:clamp(.7rem,2vw,1.6rem)}
+.edition a{color:#82d4a7;text-underline-offset:.24em}
+.edition a:focus-visible,.edition summary:focus-visible{outline:2px solid #e9b857;outline-offset:4px}
+.edition-nav>a,.edition-kicker{font:700 .76rem/1.4 system-ui,sans-serif;letter-spacing:.15em}
+.edition-nav{border-bottom:1px solid #343b41}
+.edition-main{max-width:46rem;padding:clamp(2.25rem,7vw,5rem) 0}
+.edition-main h1{font-size:clamp(2.6rem,8vw,5.25rem);line-height:1;letter-spacing:-.045em;margin:.55rem 0 1.25rem}
+.edition-kicker{color:#94cea9}
+.edition-lede{font-size:clamp(1.05rem,2vw,1.27rem);line-height:1.65;color:#ccd6cd}
+.edition-card{border:1px solid #3e4944;border-radius:14px;background:#1a211e;margin:1.3rem 0;padding:clamp(.85rem,3vw,1.5rem);line-height:1.6}
+.edition-card h2{font-size:1.2rem;margin:0 0 .7rem}
+.edition-card>summary{cursor:pointer;font-weight:700;color:#d5e9db}
+.edition-card .answer-word{font-size:clamp(1.6rem,5vw,2.4rem);letter-spacing:.14em;color:#a4e0b8;font-weight:800;margin:.75rem 0}
+.replay-rows{padding-left:1.6rem}
+.replay-rows li{margin:.55rem 0}
+.replay-rows li>span:last-child{display:inline-block;color:#c1d0c4;vertical-align:middle;margin-left:.4rem}
+.replay-tiles{display:inline-flex;gap:.23rem;vertical-align:middle}
+.replay-tile{display:inline-grid;place-items:center;width:clamp(1.35rem,5vw,2rem);height:clamp(1.5rem,5vw,2rem);border-radius:4px;background:#485251;color:#fff;font:750 .85rem/1 system-ui,sans-serif}
+.replay-tile.s1{background:#d5a853;color:#18211b}.replay-tile.s2{background:#83d2a5;color:#18211b}
+.archive-list{list-style:none;padding:0}.archive-list li{display:flex;gap:.75rem;flex-wrap:wrap;justify-content:space-between;border-bottom:1px solid #33403c;padding:.85rem 0}
+.archive-list span,.edition-footer{color:#b8c6bf}
+.edition-footer{border-top:1px solid #343b41;padding:1.2rem 0;font-size:.9rem;line-height:1.6}
+#challenge-form{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+#challenge-form input,#challenge-form button{font:inherit;color:inherit;background:#111714;border:1px solid #566760;border-radius:6px;padding:.35rem .6rem}
+#challenge-form input{width:7rem;text-transform:uppercase;letter-spacing:.1em}
+#challenge-form button:not(:disabled){background:#85d3a7;color:#19211c;cursor:pointer;font-weight:700}
