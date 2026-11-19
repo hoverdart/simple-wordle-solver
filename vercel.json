@@ -4,9 +4,9 @@
   "outputDirectory": "dist",
   "trailingSlash": true,
   "redirects": [
-    { "source": "/solve", "destination": "/", "permanent": true },
-    { "source": "/secondIndex", "destination": "/waffle/", "permanent": true },
-    { "source": "/solveWaffle", "destination": "/waffle/", "permanent": true }
+    { "source": "/solve/", "destination": "/", "permanent": true },
+    { "source": "/secondIndex/", "destination": "/waffle/", "permanent": true },
+    { "source": "/solveWaffle/", "destination": "/waffle/", "permanent": true }
   ],
   "headers": [
     { "source": "/(.*)", "headers": [

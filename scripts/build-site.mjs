@@ -4,7 +4,7 @@ import {evaluate} from '../engine.mjs';
 import {bank,challengeThrough,zone} from './challenge.mjs';
 
 const root=new URL('../',import.meta.url), out=new URL('dist/',root);
-const base=new URL(process.env.SITE_URL ?? 'https://simplewordlesolver.vercel.app/');
+const base=new URL(process.env.SITE_URL ?? 'https://wordle.shauryav.com/');
 if(base.protocol!=='https:' || base.username || base.password || base.search || base.hash || !base.pathname.endsWith('/')) throw new Error('SITE_URL must be an HTTPS site root ending in /');
 const read=async path=>readFile(new URL(path,root),'utf8');
 const put=async(path,contents)=>{
@@ -157,7 +157,7 @@ await writePage('/waffle/',{
 });
 let home=await read('index.html');
 // The repository default is the project's Vercel root; allow portable static hosting.
-home=home.replaceAll('https://simplewordlesolver.vercel.app/',base.href);
+home=home.replaceAll('https://wordle.shauryav.com/',base.href);
 if(base.pathname!=='/')home=home.replace(/(href|src)="\/(?!\/)/g,'$1="'+base.pathname);
 await put('index.html',home);
 const pagesCss=await read('pages.css');
