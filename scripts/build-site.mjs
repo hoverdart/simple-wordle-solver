@@ -28,7 +28,7 @@ const trace=new Map(summary.results.map(row=>[row.answer,row]));
 const official=await json('data/daily.json');
 await rm(out,{recursive:true,force:true});
 await mkdir(out,{recursive:true});
-for(const file of ['styles.css','app.mjs','play.mjs','engine.mjs','data/words.json','data/daily.json','data/challenge-bank.txt']) {
+for(const file of ['styles.css','assets/literata-latin.woff2','assets/literata-ofl.txt','app.mjs','play.mjs','engine.mjs','data/words.json','data/daily.json','data/challenge-bank.txt']) {
   const dest=new URL(file,out);await mkdir(fileURLToPath(new URL('.',dest)),{recursive:true});
   await copyFile(new URL(file,root),dest);
 }
@@ -51,9 +51,9 @@ function shell({path,title,description,heading,body,noindex=false}) {
   (noindex?'<meta name="robots" content="noindex,follow">':'')+
   '<link rel="icon" href="'+href('/favicon.svg')+'" type="image/svg+xml">'+
   '<link rel="stylesheet" href="'+href('/styles.css')+'"><link rel="stylesheet" href="'+href('/pages.css')+'">'+
-  '</head><body><div class="edition"><header class="edition-nav">'+link('/','WORDLE SOLVER')+
-  '<nav aria-label="Main">'+nav.map(([p,label])=>link(p,label)).join('')+'</nav></header>'+
-  '<main class="edition-main"><h1>'+e(heading)+'</h1>'+body+
+  '</head><body><a class="skip" href="#page-content">Skip to content</a><div class="edition"><header class="edition-nav">'+link('/','Wordle Solver')+
+  '<nav aria-label="Main">'+nav.map(([p,label])=>'<a href="'+e(href(p))+'"'+(p===path?' aria-current="page"':'')+'>'+e(label)+'</a>').join('')+'</nav></header>'+
+  '<main class="edition-main" id="page-content"><h1>'+e(heading)+'</h1>'+body+
   '</main><footer class="edition-footer">An independent tool by Shaurya Verma. Not affiliated with The New York Times. '+link('/method/','Sources & method')+
   '</footer></div></body></html>\n';
 }
@@ -63,7 +63,7 @@ function tiles(row){
 }
 function spoiler(edition) {
   const result=trace.get(edition.answer);
-  return '<details class="edition-card" data-nosnippet><summary>Reveal answer and walkthrough</summary>'+
+  return '<details class="edition-section" data-nosnippet><summary>Reveal answer and walkthrough</summary>'+
     '<p class="answer-word">'+e(edition.answer.toUpperCase())+'</p><p>'+
     (result.solved?'The solver reached this word in '+result.turns+' guesses.':'The solver did not solve this edition within six guesses.')+
     ' It started with SLATE and used only feedback to choose later guesses.</p>'+
@@ -71,7 +71,7 @@ function spoiler(edition) {
 }
 function shape(answer) {
   const vowels=[...answer].filter(c=>'aeiou'.includes(c)).length;
-  return '<div class="edition-card"><h2>Hints, no answer</h2><ul><li>'+vowels+' vowel '+(vowels===1?'tile':'tiles')+' (A, E, I, O, U).</li><li>'+ (new Set(answer).size===5?'No repeated letters.':'At least one letter repeats.')+'</li></ul></div>';
+  return '<div class="edition-section"><h2>Hints, no answer</h2><ul><li>'+vowels+' vowel '+(vowels===1?'tile':'tiles')+' (A, E, I, O, U).</li><li>'+ (new Set(answer).size===5?'No repeated letters.':'At least one letter repeats.')+'</li></ul></div>';
 }
 const dailyPath=d=>'/archive/'+d.date+'/';
 const list=arr=>'<ol class="archive-list">'+arr.map(row=>'<li>'+link(dailyPath(row),dated(row.date))+'<span>Edition '+row.id+'</span></li>').join('')+'</ol>';
@@ -82,7 +82,7 @@ await writePage('/today/',{
   description:'Get spoiler-free hints for the latest independent daily word challenge, then reveal the answer and an algorithmic solution walkthrough.',
   heading:'Today’s word challenge',
   body:'<p class="edition-lede">Latest posted edition: <strong>'+e(dated(newest.date))+'</strong>. This is our own five-letter daily puzzle, not the NYT Wordle answer. Editions are dated in New York time.</p>'+
-    '<section class="edition-card"><h2>Play this edition</h2><form id="challenge-form"><label for="challenge-guess">Five-letter guess</label> <input id="challenge-guess" maxlength="5" pattern="[A-Za-z]{5}" autocomplete="off" autocapitalize="characters" required> <button type="submit" disabled>Guess</button></form><p id="challenge-status" role="status">Loading challenge…</p><ol class="replay-rows" id="challenge-rows"></ol></section>'+
+    '<section class="edition-section"><h2>Play this edition</h2><form id="challenge-form"><label for="challenge-guess">Five-letter guess</label> <input id="challenge-guess" maxlength="5" pattern="[A-Za-z]{5}" autocomplete="off" autocapitalize="characters" required> <button type="submit" disabled>Guess</button></form><p id="challenge-status" role="status">Loading challenge…</p><ol class="replay-rows" id="challenge-rows"></ol></section>'+
     '<script type="module" src="'+href('/play.mjs')+'"></script>'+shape(newest.answer)+spoiler(newest)+'<p>'+link(dailyPath(newest),'Permanent link for this edition')+' · '+link('/archive/','Browse the archive')+'</p>'
 });
 await writePage('/archive/',{
@@ -103,8 +103,8 @@ for(let i=0;i<editions.length;i++) {
     heading:dated(row.date),
     body:'<p class="edition-lede">Independent five-letter puzzle. No answer is shown until you reveal it below.</p>'+
       shape(row.answer)+spoiler(row)+'<nav class="edition-pager" aria-label="Neighboring editions">'+
-      (previous?link(dailyPath(previous),'← Previous edition'):'')+link('/archive/','All editions')+
-      (next?link(dailyPath(next),'Next edition →'):'')+'</nav>'
+      (previous?link(dailyPath(previous),'Previous edition'):'')+link('/archive/','All editions')+
+      (next?link(dailyPath(next),'Next edition'):'')+'</nav>'
   });
 }
 sitePages.push('/wordle-answer/');
@@ -125,7 +125,7 @@ for(const row of official.editions){
     description:'A sourced, spoiler-gated answer for the NYT Wordle edition of '+dated(row.date)+'. Free browser solver for your own feedback.',
     heading:'Wordle answer for '+dated(row.date),
     body:'<p class="edition-lede">Use the solver if you want help without seeing the answer.</p>'+
-      shape(row.answer)+'<details class="edition-card" data-nosnippet><summary>Reveal the published answer</summary><p class="answer-word">'+e(row.answer.toUpperCase())+'</p></details>'+
+      shape(row.answer)+'<details class="edition-section" data-nosnippet><summary>Reveal the published answer</summary><p class="answer-word">'+e(row.answer.toUpperCase())+'</p></details>'+
       '<p>Source: <a href="'+e(row.sourceUrl)+'">published reporting</a>. '+link('/wordle-answer/','See selected editions')+' · '+link('/','Open the solver')+'</p>'
   });
 }
@@ -134,16 +134,16 @@ await writePage('/method/',{
   description:'Learn how the solver preserves green and yellow clues, handles duplicate letters, and ranks guesses using information gain.',
   heading:'How the solver works',
   body:'<p class="edition-lede">The solver keeps only words that would give the exact colors you entered.</p>'+
-    '<section class="edition-card"><h2>1. Score greens before yellows</h2><p>First reserve the letters that match exactly. Then count the remaining unmatched copies in the answer. A misplaced copy can only turn yellow if an unused copy is still available.</p>'+
+    '<section class="edition-section"><h2>1. Score greens before yellows</h2><p>First reserve the letters that match exactly. Then count the remaining unmatched copies in the answer. A misplaced copy can only turn yellow if an unused copy is still available.</p>'+
     '<p>For example, guess <strong>ALLEY</strong> against <strong>APPLE</strong>. A is green, the first L is yellow, the second L is gray, E is yellow, and Y is gray. A gray duplicate does not mean the letter is absent.</p></section>'+
-    '<section class="edition-card"><h2>2. Replay every row</h2><p>A candidate survives only if scoring it against all previous guesses reproduces every tile. That preserves earlier greens and prevents a yellow letter from returning to the same column.</p></section>'+
-    '<section class="edition-card"><h2>3. Split the candidates</h2><p>For each considered guess, partition the remaining words by feedback pattern. We prefer guesses with greater Shannon entropy under a uniform prior. Related metrics show the expected remaining count and the largest bucket. An information guess is sometimes useful even when it cannot itself be the answer.</p>'+
+    '<section class="edition-section"><h2>2. Replay every row</h2><p>A candidate survives only if scoring it against all previous guesses reproduces every tile. That preserves earlier greens and prevents a yellow letter from returning to the same column.</p></section>'+
+    '<section class="edition-section"><h2>3. Split the candidates</h2><p>For each considered guess, partition the remaining words by feedback pattern. We prefer guesses with greater Shannon entropy under a uniform prior. Related metrics show the expected remaining count and the largest bucket. An information guess is sometimes useful even when it cannot itself be the answer.</p>'+
     '<p>The interactive worker evaluates a bounded set of guesses for speed. The candidate filter itself checks every candidate in the loaded lexicon.</p></section>'+
-    '<section class="edition-card"><h2>What the benchmark means</h2><p><strong>'+summary.solved.toLocaleString('en-US')+' / '+summary.total.toLocaleString('en-US')+
+    '<section class="edition-section"><h2>What the benchmark means</h2><p><strong>'+summary.solved.toLocaleString('en-US')+' / '+summary.total.toLocaleString('en-US')+
     '</strong> in six guesses on our frozen original challenge bank; '+summary.failed+' unsolved. '+
     (summary.averageGuessesSolved==null?'':'Mean among solved: '+summary.averageGuessesSolved.toFixed(2)+' guesses. ')+
     'All runs began with SLATE and then ranked the full challenge bank by entropy while respecting prior guesses. The actual hidden target was used only to score guesses. This is a self-defined benchmark, not a guarantee over NYT Wordle, and not a proof of shortest play.</p></section>'+
-    '<section class="edition-card"><h2>Sources and limits</h2><p>The default word list includes '+answers.length.toLocaleString('en-US')+
+    '<section class="edition-section"><h2>Sources and limits</h2><p>The default word list includes '+answers.length.toLocaleString('en-US')+
     ' candidate answers and '+guesses.length.toLocaleString('en-US')+
     ' allowed suggestions from the public-domain <a href="https://www.gutenberg.org/ebooks/3201">Moby word lists</a>. The NYT vocabulary is not distributed here; a valid NYT word may be missing, and the site may suggest words NYT does not accept.</p>'+
     '<p>Our original challenge uses a frozen editorial word bank. Only editions dated today or earlier are emitted. The separately sourced official-answer cache currently has '+e(official.editions?.length??0)+' entries and is not a comprehensive history.</p>'+

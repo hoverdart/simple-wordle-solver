@@ -1,16 +1,71 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#6c757d"><title>Simple Wordle Solver</title><meta name="description" content="Turn your Wordle feedback into a better next guess. Filter possible answers, compare suggestions, and explore an independent daily challenge and archive. Free, private, and browser-based."><meta property="og:type" content="website"><meta property="og:title" content="Simple Wordle Solver"><meta property="og:description" content="Filter five-letter candidates from your colored clues and compare better guesses."><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="canonical" href="https://wordle.shauryav.com/"><link rel="stylesheet" href="/styles.css"><script type="module" src="/app.mjs"></script></head>
-<body><a class="skip" href="#solver">Skip to solver</a><div class="shell">
-<header class="title-slab"><h1>Wordle Solver</h1><p><a href="/waffle/">Legacy Waffle helper</a></p></header>
-<nav class="site-nav" aria-label="Main navigation"><a href="/" aria-current="page">Solver</a><a href="/today/">Daily challenge</a><a href="/archive/">Archive</a><a href="/wordle-answer/">NYT answers</a><a href="/method/">Method</a></nav>
-<main><div class="workspace" id="solver">
-<section class="input-panel" aria-labelledby="input-title"><h2 id="input-title">Find my <span class="green-text">WORDLE</span></h2>
-<form id="guess-form"><label for="guess">Five-letter guess</label><input id="guess" name="guess" type="text" maxlength="5" pattern="[A-Za-z]{5}" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. CRANE" aria-describedby="feedback-help" required>
-<p id="feedback-help" class="help">Tap tiles to match your feedback. Use Tab and Enter or Space on a keyboard.</p><div class="feedback" id="feedback" role="group" aria-label="Feedback for each letter"></div>
-<div class="legend" aria-label="Feedback colors"><span><i class="absent"></i>Absent</span><span><i class="present"></i>Wrong spot</span><span><i class="correct"></i>Right spot</span></div>
-<button id="apply" class="primary" type="submit" disabled>Solve!</button><p id="message" role="status" aria-live="polite" class="message">Loading the word list…</p></form>
-<div class="history-header"><h3>Previous guesses</h3><span id="round-label" class="small-label">Guess 1</span></div><ol id="history" class="history"><li>No guesses yet.</li></ol><div class="history-actions"><button id="undo" class="secondary" disabled>Undo last</button><button id="reset" class="secondary" disabled>Reset</button></div></section>
-<section class="results-panel" aria-labelledby="results-title"><h2 id="results-title">Possible words: <span id="candidate-count" class="green-text">—</span></h2><p id="result-context" class="help">Words matching every clue.</p><span id="data-status" class="sr-only">Loading</span><div class="scrollable-table"><table class="word-table"><thead><tr><th scope="col">#</th><th scope="col">Word</th></tr></thead><tbody id="candidates"></tbody></table></div><p class="help" id="candidate-note"></p><details id="candidate-details" open><summary>Suggested next guesses</summary><p class="help" id="ranking-note">Suggestions will appear when the word list is ready.</p><ol id="suggestions" class="suggestions"></ol></details></section>
-<section class="instructions" aria-labelledby="instructions-title"><h2 id="instructions-title">How to Use the <span class="green-text">Simple WORDLE</span> Solver</h2><ol class="list-group"><li class="list-success">Enter a five-letter guess. Set green tiles where letters are correct.</li><li class="list-warning">Set yellow tiles for letters in the wrong position.</li><li class="list-dark">Leave absent letters gray. Repeated letters are handled separately.</li><li class="list-primary">Click “Solve!” to find matching words. Add each guess to keep all your clues.</li></ol><p class="help">This dictionary is not the official Wordle answer list. Your guesses stay in this browser.</p></section>
-</div><section class="daily-strip" aria-labelledby="daily-title"><div><h2 id="daily-title">Daily word challenge</h2><p id="daily-meta">An original daily puzzle, separate from NYT Wordle.</p><p><a href="/today/">Play today’s challenge</a> · <a href="/archive/">Challenge archive</a> · <a href="/wordle-answer/">NYT answer index</a></p></div><div class="daily-actions"><button id="reveal" class="secondary" disabled>Reveal challenge answer</button><div id="daily-answer" hidden></div></div></section></main>
-<footer><span>Wordle Solver by <a href="https://www.shauryav.com/">Shaurya</a></span><span>Not affiliated with The New York Times. <a href="/method/">How it works</a></span></footer></div><noscript><p>The solver needs JavaScript. You can still browse the <a href="/archive/">archive</a>.</p></noscript></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f8f6ef">
+  <title>Wordle Solver | Find Words from Your Clues</title>
+  <meta name="description" content="Enter your Wordle feedback to find matching words and rank your next guess. Handles repeated letters and remembers every clue.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Wordle Solver">
+  <meta property="og:description" content="Find matching words from your Wordle clues and compare your next guesses.">
+  <link rel="canonical" href="https://wordle.shauryav.com/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.mjs"></script>
+</head>
+<body>
+<a class="skip" href="#solver">Skip to solver</a>
+<div class="shell">
+  <header class="masthead">
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="/" aria-current="page">Solver</a><a href="/today/">Daily puzzle</a><a href="/archive/">Archive</a><a href="/wordle-answer/">NYT answers</a><a href="/method/">Method</a>
+    </nav>
+    <h1>Wordle Solver</h1>
+  </header>
+  <main id="solver">
+    <div class="workspace">
+      <section class="input-panel" aria-labelledby="input-title">
+        <h2 id="input-title">Your clues</h2>
+        <form id="guess-form">
+          <label for="guess">Five-letter guess</label>
+          <div class="guess-entry">
+            <input id="guess" name="guess" type="text" maxlength="5" pattern="[A-Za-z]{5}" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="CRANE" aria-describedby="feedback-help" required>
+            <button id="apply" class="primary" type="submit" disabled>Add clue</button>
+          </div>
+          <p id="feedback-help" class="help">Tap each tile to match the color from your game.</p>
+          <div class="feedback" id="feedback" role="group" aria-label="Feedback for each letter"></div>
+          <div class="legend" aria-label="Feedback colors">
+            <span><i class="absent" aria-hidden="true"></i>Absent</span><span><i class="present" aria-hidden="true"></i>Wrong spot</span><span><i class="correct" aria-hidden="true"></i>Right spot</span>
+          </div>
+          <p id="message" role="status" aria-live="polite" class="message">Loading words…</p>
+        </form>
+        <div class="history-header"><h3>Previous guesses</h3><div class="history-actions"><button id="undo" class="quiet-button" type="button" disabled>Undo</button><button id="reset" class="quiet-button" type="button" disabled>Clear</button></div></div>
+        <span id="round-label" class="sr-only">Guess 1</span>
+        <ol id="history" class="history"><li class="empty-history">No clues yet.</li></ol>
+      </section>
+      <section class="results-panel" aria-labelledby="results-title">
+        <h2 id="results-title">Possible words <span id="candidate-count" class="count">—</span></h2>
+        <p id="result-context" class="help">Words matching every clue.</p>
+        <span id="data-status" class="sr-only">Loading</span>
+        <section class="suggestions-section" aria-labelledby="suggestions-title">
+          <h3 id="suggestions-title">Suggested guesses</h3>
+          <ol id="suggestions" class="suggestions"></ol><p class="help" id="ranking-note">Loading suggestions…</p>
+        </section>
+        <details id="candidate-details">
+          <summary>Matching words</summary>
+          <div class="scrollable-table"><table class="word-table"><thead><tr><th scope="col">#</th><th scope="col">Word</th></tr></thead><tbody id="candidates"></tbody></table></div>
+          <p class="help" id="candidate-note"></p>
+        </details>
+      </section>
+    </div>
+    <section class="daily-strip" aria-labelledby="daily-title">
+      <div><h2 id="daily-title"><a href="/today/">Daily puzzle</a></h2><p id="daily-meta" class="help">An original daily puzzle, separate from NYT Wordle.</p></div>
+      <div class="daily-actions"><button id="reveal" class="secondary" type="button" disabled>Reveal answer</button><div id="daily-answer" hidden></div></div>
+    </section>
+  </main>
+  <footer class="site-footer"><a href="https://www.shauryav.com/">By Shaurya Verma</a><p>Independent. Not affiliated with The New York Times.</p></footer>
+</div>
+<noscript><p class="noscript">The solver needs JavaScript. You can still browse the <a href="/archive/">archive</a>.</p></noscript>
+</body>
+</html>
