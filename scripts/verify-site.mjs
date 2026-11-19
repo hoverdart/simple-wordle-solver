@@ -22,6 +22,8 @@ for(const url of urls) {
   assert(!html.includes('noindex') || !/<meta name="robots" content="noindex/.test(html));
   assert(/<title>[^<]+<\/title>/.test(html));
   assert(/<h1[ >]/.test(html));
+  assert(!/class="[^"]*\b(?:eyebrow|edition-kicker)\b/.test(html), 'No decorative eyebrow text');
+  assert(!/make your next guess count|a little logic|one word\. a new way in/i.test(html), 'No decorative taglines');
   assert(/<meta name="description" content="[^"]+"/.test(html));
   for(const [,href] of html.matchAll(/(?:href|src)="(\/[^"]*)"/g)) {
     const linked=toFile(new URL(href,url).pathname);

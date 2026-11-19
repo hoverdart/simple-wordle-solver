@@ -26,3 +26,20 @@ test('feedback cycles absent-present-correct-absent, invalid guess does not appe
 test('dictionary failure has explicit fallback and no fake counts',async()=>{const {get}=await fixture({fail:true});assert.equal(get('data-status').textContent,'UNAVAILABLE');assert.equal(get('candidate-count').textContent,'—');assert.match(get('message').textContent,/could not load/);});
 
 test('original daily challenge is spoiler-gated and isolated from manual board',async()=>{const {get}=await fixture({challenge:true});assert.equal(get('daily-answer').hidden,true);assert.equal(get('daily-answer').textContent,'');get('reveal').click();assert.equal(get('daily-answer').textContent,'APPLE');assert.equal(get('daily-answer').hidden,false);assert.equal(get('candidate-count').textContent,'9');get('reveal').click();assert.equal(get('daily-answer').hidden,true);assert.equal(get('daily-answer').textContent,'');});
+
+test('homepage preserves original Bootstrap-style visual structure without remote visual assets',()=>{
+ const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
+ const css=fs.readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+ assert.match(html,/class="title-slab"/);assert.match(html,/>Wordle Solver<\/h1>/);
+ assert.match(html,/<tbody id="candidates">/);assert.match(html,/class="list-success"/);
+ assert.doesNotMatch(html,/eyebrow|crystal ball|Make your next|A FRESH CHALLENGE/);
+ assert.doesNotMatch(css,/@import|url\(/);assert.match(css,/\.title-slab\{background:#6c757d/);
+ assert.match(css,/\.input-panel\{order:0\}/);assert.match(css,/\.results-panel\{order:1\}/);
+});
+test('candidate table rows retain accessible word actions',async()=>{
+ const {get,submit}=await fixture();submit('allee','21002');submit('ample','20222');
+ const rows=get('candidates').children;assert.equal(rows.length,1);
+ assert.equal(rows[0].children[0].attrs.scope,'row');
+ const button=rows[0].children[1].children[0];assert.equal(button.textContent,'APPLE');
+ button.click();assert.equal(get('guess').value,'APPLE');assert.equal(get('candidate-count').textContent,'1');
+});
